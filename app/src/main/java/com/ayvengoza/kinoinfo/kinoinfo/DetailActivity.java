@@ -1,10 +1,15 @@
 package com.ayvengoza.kinoinfo.kinoinfo;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ShareActionProvider;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,12 +23,13 @@ public class DetailActivity extends AppCompatActivity {
     private TextView titleView;
     private TextView scoreView;
     private TextView descriptionView;
+    private FilmDataObject film;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        FilmDataObject film = (FilmDataObject) getIntent().getParcelableExtra(FilmDataObject.class.getCanonicalName());
+        film = (FilmDataObject) getIntent().getParcelableExtra(FilmDataObject.class.getCanonicalName());
         backgroundImage = (ImageView)findViewById(R.id.detail_back_image);
         filmImage =(ImageView) findViewById(R.id.detail_film_image);
         titleView = (TextView)findViewById(R.id.detail_title);
@@ -35,6 +41,27 @@ public class DetailActivity extends AppCompatActivity {
         scoreView.setText(film.getVoteAverage());
         descriptionView.setText(film.getOverview());
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.detail, menu);
+        MenuItem item =  menu.findItem(R.id.action_share_id);
+
+        ShareActionProvider shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+        if(shareActionProvider != null){
+            shareActionProvider.setShareIntent(createShareForecastIntent());
+        }
+        return true;
+    }
+
+    private Intent createShareForecastIntent(){
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, film.getTitle());
+        return shareIntent;
     }
 
     class ImageDownloadTask extends AsyncTask<FilmDataObject, Void, Void>{
@@ -51,10 +78,14 @@ public class DetailActivity extends AppCompatActivity {
             InputStream in = null;
 
             try {
-                in = new URL(addingAdress + filmObj.getBackgropPath()).openStream();
-                imageBack = BitmapFactory.decodeStream(in);
-                in = new URL(addingAdress + filmObj.getPosterPath()).openStream();
-                imagePoster = BitmapFactory.decodeStream(in);
+                if(filmObj.getPosterPath() != null) {
+                    in = new URL(addingAdress + filmObj.getPosterPath()).openStream();
+                    imagePoster = BitmapFactory.decodeStream(in);
+                }
+                if(filmObj.getBackgropPath() != null) {
+                    in = new URL(addingAdress + filmObj.getBackgropPath()).openStream();
+                    imageBack = BitmapFactory.decodeStream(in);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -70,8 +101,10 @@ public class DetailActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            backgroundImage.setImageBitmap(Bitmap.createScaledBitmap(imageBack, 1000, 400, false));
-            filmImage.setImageBitmap(Bitmap.createScaledBitmap(imagePoster, 200, 300, false));
+            if(imageBack != null)
+                backgroundImage.setImageBitmap(Bitmap.createScaledBitmap(imageBack, 1000, 400, false));
+            if(imagePoster != null)
+                filmImage.setImageBitmap(Bitmap.createScaledBitmap(imagePoster, 200, 300, false));
         }
     }
 }

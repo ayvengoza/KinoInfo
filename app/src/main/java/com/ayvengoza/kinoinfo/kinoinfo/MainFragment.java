@@ -2,10 +2,12 @@ package com.ayvengoza.kinoinfo.kinoinfo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -66,7 +68,7 @@ public class MainFragment extends Fragment {
         switch (id){
             case R.id.refresh_main_fragment:
                 DownloadFilmData downloadFilmTask = new DownloadFilmData();
-                downloadFilmTask.execute(wedAdrdess);
+                downloadFilmTask.execute(makeReqwestString());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -195,6 +197,18 @@ public class MainFragment extends Fragment {
             }
             return null;
         }
+    }
+
+    private String makeReqwestString(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String page = sharedPreferences.getString("pref_page_number_key", "1");
+        Log.d(DEBUG_TAG, "Shared preferences. Page = " + page);
+        String sort = sharedPreferences.getString("pref_sort_by_key", "popularity.desc");
+        Log.d(DEBUG_TAG, "Shared preferences. sort = " + sort);
+        boolean adult = sharedPreferences.getBoolean("include_adult_key", false);
+        return "https://api.themoviedb.org/3/discover/movie?api_key=b7094a341146a208cb2af9ae6bf6439f&language=en-US&sort_by="+sort
+                +"&include_adult="+ adult
+                +"&include_video=false&page="+page;
     }
 
 }

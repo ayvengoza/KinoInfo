@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <Preference
+    <EditTextPreference
         android:key="pref_page_number_key"
         android:title="@string/pref_title_page"
-        android:
+        android:inputType="numberDecimal"
         android:defaultValue="1"/>
     <ListPreference
         android:key="pref_sort_by_key"
-        android:title="@string/pref_sorted_by_title"/>
+        android:title="@string/pref_sorted_by_title"
+        android:entries="@array/pref_sortOrder_entries"
+        android:entryValues="@array/pref_sortedOrder_values"/>
+    <CheckBoxPreference
+        android:key="include_adult_key"
+        android:title="@string/include_adult_title"
+        android:defaultValue="false"/>
 </PreferenceScreen>

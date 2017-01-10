@@ -6,4 +6,6 @@
     <string name="name_refrash_item">Refresh</string>
     <string name="pref_title_page">Page number</string>
     <string name="pref_sorted_by_title">Sort by</string>
+    <string name="include_adult_title">Include adult</string>
+    <string name="menu_settings">Settings</string>
 </resources>
